@@ -330,7 +330,7 @@ function adminPage(orders) {
     </section>`);
 }
 
-const server = http.createServer(async (req, res) => {
+const requestHandler = async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const cookies = Object.fromEntries((req.headers.cookie || '').split(';').map(v => v.trim()).filter(Boolean).map(v => { const i = v.indexOf('='); return [v.slice(0, i), decodeURIComponent(v.slice(i + 1))]; }));
 
@@ -407,6 +407,11 @@ const server = http.createServer(async (req, res) => {
   }
 
   send(res, 404, 'Not Found');
-});
+};
 
-server.listen(PORT, () => console.log(`chatgpt-team-frontend running on http://127.0.0.1:${PORT}`));
+module.exports = { requestHandler };
+
+if (require.main === module) {
+  const server = http.createServer(requestHandler);
+  server.listen(PORT, () => console.log(`chatgpt-team-frontend running on http://127.0.0.1:${PORT}`));
+}
